@@ -1,6 +1,4 @@
-/* ============================================
-   LIT VAULT — Estilos Globales (Pastel Edition)
-   ============================================ */
+/* style.css */
 
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&family=JetBrains+Mono:wght@300;400&display=swap');
 
@@ -46,7 +44,7 @@ body {
   min-height: 100vh;
 }
 
-/* ---------- Fondo pastel ---------- */
+/* Fondo pastel */
 .vault-bg-pattern {
   position: fixed; inset: 0; z-index: 0; pointer-events: none;
   background:
@@ -65,14 +63,14 @@ body {
   background-size: 36px 36px;
 }
 
-/* ---------- Esquinas decorativas ---------- */
+/* Esquinas decorativas */
 .corner { position: fixed; width: 72px; height: 72px; border-color: var(--rose-dim); border-style: solid; z-index: 1; pointer-events: none; }
 .corner.tl { top: 16px;    left: 16px;  border-width: 1px 0 0 1px; }
 .corner.tr { top: 16px;    right: 16px; border-width: 1px 1px 0 0; }
 .corner.bl { bottom: 16px; left: 16px;  border-width: 0 0 1px 1px; }
 .corner.br { bottom: 16px; right: 16px; border-width: 0 1px 1px 0; }
 
-/* ---------- Navbar ---------- */
+/* Navbar */
 .vault-nav {
   position: relative; z-index: 10;
   display: flex; justify-content: space-between; align-items: center;
@@ -94,14 +92,14 @@ body {
 }
 .btn-logout:hover { background: rgba(184,58,42,0.07); }
 
-/* ---------- Divider ---------- */
+/* Divider */
 .divider {
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--rose-dim), var(--gold-dim), transparent);
   margin: 20px 0;
 }
 
-/* ---------- Inputs ---------- */
+/* Inputs */
 .vault-input {
   width: 100%; background: var(--bg-input);
   border: 1px solid var(--rose-dim); color: #1a1a1a;
@@ -116,7 +114,7 @@ body {
 
 .field-label { display: block; font-family: var(--font-display); font-size: 9px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 6px; }
 
-/* ---------- Botones ---------- */
+/* Botones */
 .btn-primary {
   font-family: var(--font-display); font-size: 11px; letter-spacing: 4px; font-weight: 600;
   text-transform: uppercase; width: 100%;
@@ -135,7 +133,7 @@ body {
 }
 .btn-secondary:hover { background: var(--rose-faint); color: var(--rose); }
 
-/* ---------- Tarjetas de credencial ---------- */
+/* Tarjetas de credencial */
 .credential-card {
   background: var(--bg-card);
   border: 1px solid var(--rose-dim);
@@ -167,13 +165,13 @@ body {
 .btn-delete { position: absolute; top: 12px; right: 12px; font-size: 10px; color: rgba(184,58,42,0.28); background: transparent; border: none; cursor: pointer; padding: 4px 6px; transition: color var(--transition); font-family: var(--font-mono); }
 .btn-delete:hover { color: var(--danger); }
 
-/* ---------- Mensajes ---------- */
+/* Mensajes */
 .msg { font-family: var(--font-body); font-size: 13px; padding: 10px 14px; border-radius: var(--radius); margin-top: 12px; font-style: italic; display: none; }
 .msg.error   { color: var(--danger);  border: 1px solid rgba(184,58,42,0.2);  background: rgba(184,58,42,0.05);  display: block; }
 .msg.success { color: var(--success); border: 1px solid rgba(90,122,90,0.2);  background: rgba(90,122,90,0.05);  display: block; }
 .msg.info    { color: var(--gold);    border: 1px solid var(--gold-dim);       background: var(--gold-faint);     display: block; }
 
-/* ---------- Buscador ---------- */
+/* Buscador */
 .search-wrap { position: relative; max-width: 400px; }
 .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 14px; pointer-events: none; }
 .search-input {
@@ -185,16 +183,16 @@ body {
 .search-input::placeholder { color: var(--text-dim); }
 .search-input:focus { border-color: var(--rose); box-shadow: 0 0 0 3px rgba(196,120,138,0.1); }
 
-/* ---------- Empty state ---------- */
+/* Empty state */
 .empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 20px; }
 .empty-state-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.22; }
 .empty-state-text { font-family: var(--font-display); font-size: 11px; letter-spacing: 3px; color: var(--text-dim); text-transform: uppercase; }
 
-/* ---------- Session timer ---------- */
+/* Session timer */
 .session-timer { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); transition: color var(--transition); }
 .session-timer.warning { color: var(--danger); }
 
-/* ---------- Animaciones ---------- */
+/* Animaciones */
 @keyframes fadeInUp {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -207,10 +205,7 @@ body {
 }
 .lock-pulse { animation: pulse-rose 3s ease-in-out infinite; }
 
-/* ============================================
-   VAULT MAIN PAGE (pass.html)
-   ============================================ */
-
+/* VAULT MAIN PAGE (pass.html) */
 .main-wrap {
   position: relative;
   z-index: 5;
@@ -349,10 +344,7 @@ body {
 }
 .toast.show { opacity: 1; transform: translateY(0); }
 
-/* ============================================
-   LOGIN PAGE (index.html)
-   ============================================ */
-
+/* LOGIN PAGE (index.html)*/
 body.login-page {
   display: flex;
   align-items: center;
@@ -399,7 +391,7 @@ body.login-page {
   font-size: 15px; font-style: italic; margin-top: 14px;
 }
 
-/* ---------- Responsive ---------- */
+/* Responsive */
 @media (max-width: 640px) {
   .vault-nav { padding: 12px 16px; }
   .vault-nav-logo { font-size: 14px; letter-spacing: 4px; }
