@@ -1,0 +1,200 @@
+<!-- pass.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LIT Vault — Bóveda</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    .main-wrap {
+      position: relative;
+      z-index: 5;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    .add-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--rose-dim);
+      padding: 28px;
+      margin-bottom: 36px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 20px rgba(196,120,138,0.07);
+    }
+
+    .add-panel-title {
+      font-family: var(--font-display);
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .add-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    @media (max-width: 768px) {
+      .add-grid { grid-template-columns: 1fr; }
+    }
+
+    .add-note {
+      font-size: 12px;
+      color: var(--text-dim);
+      font-style: italic;
+      margin-top: 12px;
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-title {
+      font-family: var(--font-display);
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--rose);
+      text-transform: uppercase;
+    }
+
+    .toolbar-count {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-left: 10px;
+    }
+
+    .credentials-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .timer-bar {
+      height: 3px;
+      background: var(--rose-dim);
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 100;
+      transition: width 1s linear, background 1s;
+    }
+
+    .btn-save {
+      font-family: var(--font-display);
+      font-size: 10px;
+      letter-spacing: 2px;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--rose), var(--rose-light));
+      color: #fff8f4;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: var(--radius);
+      white-space: nowrap;
+      transition: opacity var(--transition);
+      width: 100%;
+      text-shadow: 0 1px 2px rgba(90,40,55,0.18);
+    }
+    .btn-save:hover { opacity: 0.85; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px; right: 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--rose-dim);
+      color: var(--success);
+      font-family: var(--font-display);
+      font-size: 10px;
+      letter-spacing: 2px;
+      padding: 10px 20px;
+      z-index: 200;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 16px rgba(196,120,138,0.12);
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+
+  <div class="timer-bar" id="timer-bar"></div>
+  <div class="vault-bg-pattern"></div>
+  <div class="vault-grid"></div>
+  <div class="corner tl"></div>
+  <div class="corner tr"></div>
+  <div class="corner bl"></div>
+  <div class="corner br"></div>
+
+  <nav class="vault-nav">
+    <div class="vault-nav-logo">LIT <span style="color: var(--rose-dim);">VAULT</span></div>
+    <div class="vault-nav-badge">AES-256 ENCRIPTADO</div>
+    <div class="vault-nav-user">
+      <span id="nav-user">—</span>
+      <span class="session-timer" id="session-timer">15:00</span>
+      <button class="btn-logout" onclick="logout()">Cerrar Sesión</button>
+    </div>
+  </nav>
+
+  <div class="main-wrap">
+
+    <div class="add-panel fade-in">
+      <p class="add-panel-title">Nueva Credencial</p>
+      <div class="add-grid">
+        <div>
+          <label class="field-label" for="inp-site">Servicio</label>
+          <input class="vault-input" type="text" id="inp-site" placeholder="Gmail, GitHub..."/>
+        </div>
+        <div>
+          <label class="field-label" for="inp-user">Usuario / Email</label>
+          <input class="vault-input" type="text" id="inp-user" placeholder="usuario@email.com" autocomplete="off"/>
+        </div>
+        <div>
+          <label class="field-label" for="inp-pass">Contraseña</label>
+          <input class="vault-input" type="password" id="inp-pass" placeholder="••••••••" autocomplete="off"/>
+        </div>
+        <div>
+          <button class="btn-save" onclick="saveCredential()">Guardar</button>
+        </div>
+      </div>
+      <div id="add-msg"></div>
+      <p class="add-note">Las contraseñas se encriptan localmente antes de subirse a la base de datos.</p>
+    </div>
+
+    <div class="toolbar">
+      <div>
+        <span class="toolbar-title">Bóveda</span>
+        <span class="toolbar-count" id="cred-count">— registros</span>
+      </div>
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input class="search-input" type="text" id="search-input" placeholder="Buscar servicio..." oninput="filterCredentials()"/>
+      </div>
+    </div>
+
+    <div class="credentials-grid" id="credentials-grid"></div>
+
+  </div>
+
+  <div class="toast" id="toast">Copiado al portapapeles</div>
+
+  <script src="app.js"></script>
+</body>
+</html>

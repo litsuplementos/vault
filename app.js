@@ -1,6 +1,4 @@
-// ============================================================
-//  LIT VAULT — app.js
-// ============================================================
+// app.js
 
 const SUPABASE_URL = "https://jaoirokvofscundirnzk.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb2lyb2t2b2ZzY3VuZGlybnprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwNzU3NzMsImV4cCI6MjA5MDY1MTc3M30.U1NsVWh3ephcLjh8LGVVwQrAiEZJFt_BLiZYABgZmBY";
@@ -14,12 +12,12 @@ function requireSession() {
   const start = sessionStorage.getItem('sessionStart');
 
   if (!key || !start) {
-    window.location.replace('login.html');
+    window.location.replace('pass.html');
     throw new Error('Sin sesión.');
   }
   if (Date.now() - parseInt(start) >= SESSION_DURATION) {
     sessionStorage.clear();
-    window.location.replace('login.html');
+    window.location.replace('pass.html');
     throw new Error('Sesión expirada.');
   }
 }
@@ -65,7 +63,7 @@ startSessionTimer();
 function logout() {
   clearInterval(sessionInterval);
   sessionStorage.clear();
-  window.location.replace('login.html');
+  window.location.replace('pass.html');
 }
 
 // ─── CIFRADO AES-256 ─────────────────────────────────────────
