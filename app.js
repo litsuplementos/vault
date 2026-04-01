@@ -6,7 +6,7 @@ const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const SESSION_DURATION = 15 * 60 * 1000;
 
-// ─── GUARD — detiene TODO el script si no hay sesión válida ──
+// GUARD, detiene TODO el script si no hay sesión válida
 function requireSession() {
   const key   = sessionStorage.getItem('masterKey');
   const start = sessionStorage.getItem('sessionStart');
@@ -22,16 +22,16 @@ function requireSession() {
   }
 }
 
-requireSession(); // Si falla, el throw para aquí todo el script
+requireSession();
 
-// ─── INIT ────────────────────────────────────────────────────
+// INIT
 const MASTER_KEY = sessionStorage.getItem('masterKey');
 const adminUser  = sessionStorage.getItem('adminUser') || 'admin';
 
 const navUser = document.getElementById('nav-user');
 if (navUser) navUser.textContent = adminUser;
 
-// ─── TIMER DE SESIÓN ─────────────────────────────────────────
+// TIMER DE SESIÓN
 let sessionInterval;
 
 function startSessionTimer() {
@@ -59,14 +59,14 @@ function startSessionTimer() {
 
 startSessionTimer();
 
-// ─── LOGOUT ──────────────────────────────────────────────────
+// LOGOUT
 function logout() {
   clearInterval(sessionInterval);
   sessionStorage.clear();
   window.location.replace('pass.html');
 }
 
-// ─── CIFRADO AES-256 ─────────────────────────────────────────
+// CIFRADO AES-256
 function encrypt(text) { return CryptoJS.AES.encrypt(text, MASTER_KEY).toString(); }
 
 function decrypt(hash) {
@@ -76,7 +76,7 @@ function decrypt(hash) {
   } catch { return '[error al descifrar]'; }
 }
 
-// ─── MENSAJES UI ─────────────────────────────────────────────
+// MENSAJES UI
 function setMsg(elId, text, type = 'error') {
   const el = document.getElementById(elId);
   if (!el) return;
@@ -92,26 +92,28 @@ function showToast(text = 'Copiado al portapapeles') {
   setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-// ─── DATOS ───────────────────────────────────────────────────
+// DATOS
 let allCredentials = [];
 
-// ─── GUARDAR ─────────────────────────────────────────────────
+// GUARDAR
 async function saveCredential() {
-  const site = document.getElementById('inp-site').value.trim();
-  const user = document.getElementById('inp-user').value.trim();
-  const pass = document.getElementById('inp-pass').value;
+  const site  = document.getElementById('inp-site').value.trim();
+  const user  = document.getElementById('inp-user').value.trim();
+  const pass  = document.getElementById('inp-pass').value;
+  const notes = document.getElementById('inp-notes').value.trim();
 
   if (!site || !pass) { setMsg('add-msg', 'El servicio y la contraseña son obligatorios.', 'error'); return; }
 
   try {
     const { error } = await _sb.rpc('insert_credential', {
-      p_site: site, p_username: user, p_hash: encrypt(pass)
+      p_site: site, p_username: user, p_hash: encrypt(pass), p_notes: notes || null
     });
     if (error) throw error;
     setMsg('add-msg', '¡Credencial guardada de forma segura!', 'success');
-    document.getElementById('inp-site').value = '';
-    document.getElementById('inp-user').value = '';
-    document.getElementById('inp-pass').value = '';
+    document.getElementById('inp-site').value  = '';
+    document.getElementById('inp-user').value  = '';
+    document.getElementById('inp-pass').value  = '';
+    document.getElementById('inp-notes').value = '';
     await fetchCredentials();
   } catch (err) {
     console.error(err);
@@ -119,7 +121,7 @@ async function saveCredential() {
   }
 }
 
-// ─── OBTENER ─────────────────────────────────────────────────
+// OBTENER
 async function fetchCredentials() {
   try {
     const { data, error } = await _sb.rpc('get_credentials');
@@ -129,7 +131,7 @@ async function fetchCredentials() {
   } catch (err) { console.error(err); }
 }
 
-// ─── ELIMINAR ────────────────────────────────────────────────
+// ELIMINAR
 async function deleteCredential(id) {
   if (!confirm('¿Eliminar esta credencial permanentemente?')) return;
   try {
@@ -141,18 +143,19 @@ async function deleteCredential(id) {
   } catch (err) { console.error(err); alert('Error al eliminar.'); }
 }
 
-// ─── FILTRAR ─────────────────────────────────────────────────
+// FILTRAR
 function filterCredentials() {
   const query = document.getElementById('search-input').value.toLowerCase().trim();
   renderCredentials(query
     ? allCredentials.filter(c =>
         c.site_name.toLowerCase().includes(query) ||
-        (c.username || '').toLowerCase().includes(query))
+        (c.username || '').toLowerCase().includes(query) ||
+        (c.notes || '').toLowerCase().includes(query))
     : allCredentials
   );
 }
 
-// ─── RENDERIZAR ──────────────────────────────────────────────
+// RENDERIZAR
 function renderCredentials(list) {
   const container = document.getElementById('credentials-grid');
   const countEl   = document.getElementById('cred-count');
@@ -192,6 +195,21 @@ function renderCredentials(list) {
     user.className = 'credential-user';
     user.textContent = item.username || '—';
 
+    // Notas (solo se muestra si hay contenido)
+    if (item.notes) {
+      const notesEl = document.createElement('div');
+      notesEl.className = 'credential-notes';
+      notesEl.textContent = item.notes;
+      card.appendChild(btnDelete);
+      card.appendChild(site);
+      card.appendChild(user);
+      card.appendChild(notesEl);
+    } else {
+      card.appendChild(btnDelete);
+      card.appendChild(site);
+      card.appendChild(user);
+    }
+
     const dateEl = document.createElement('div');
     dateEl.className = 'credential-date';
     dateEl.textContent = `Añadido: ${date}`;
@@ -220,23 +238,20 @@ function renderCredentials(list) {
     passDisplay.appendChild(passText);
     passDisplay.appendChild(btnShow);
     passDisplay.appendChild(btnCopy);
-    card.appendChild(btnDelete);
-    card.appendChild(site);
-    card.appendChild(user);
     card.appendChild(dateEl);
     card.appendChild(passDisplay);
     container.appendChild(card);
   });
 }
 
-// ─── TOGGLE PASS ─────────────────────────────────────────────
+// TOGGLE PASS
 function togglePass(textEl, btn, plainPass) {
   const isHidden = textEl.textContent === '••••••••';
   textEl.textContent = isHidden ? plainPass : '••••••••';
   btn.textContent    = isHidden ? 'OCULTAR' : 'VER';
 }
 
-// ─── ENTER ───────────────────────────────────────────────────
+// ENTER
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && document.activeElement.id.startsWith('inp-')) saveCredential();
 });

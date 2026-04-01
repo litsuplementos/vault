@@ -1,4 +1,5 @@
 <!-- pass.html -->
+ 
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -47,6 +48,10 @@
           <input class="vault-input" type="password" id="inp-pass" placeholder="••••••••" autocomplete="off"/>
         </div>
         <div>
+          <label class="field-label" for="inp-notes">Notas</label>
+          <input class="vault-input" type="text" id="inp-notes" placeholder="Cuenta personal, trabajo..." autocomplete="off"/>
+        </div>
+        <div class="add-grid-save">
           <button class="btn-save" onclick="saveCredential()">Guardar</button>
         </div>
       </div>
@@ -55,11 +60,9 @@
     </div>
 
     <div class="toolbar">
-      <div class="toolbar-top">
-        <div>
-          <span class="toolbar-title">Bóveda</span>
-          <span class="toolbar-count" id="cred-count">— registros</span>
-        </div>
+      <div class="toolbar-left">
+        <span class="toolbar-title">Bóveda</span>
+        <span class="toolbar-count" id="cred-count">— registros</span>
       </div>
       <div class="search-wrap">
         <span class="search-icon">⌕</span>
