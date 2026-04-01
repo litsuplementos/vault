@@ -11,61 +11,45 @@
     body { display: flex; align-items: center; justify-content: center; min-height: 100vh; overflow: hidden; }
 
     .login-card {
-      position: relative;
-      z-index: 5;
-      width: 360px;
-      padding: 44px 36px 36px;
-      border: 1px solid var(--gold-dim);
-      background: var(--dark-card);
+      position: relative; z-index: 5;
+      width: 400px; padding: 48px 40px 40px;
+      border: 1px solid var(--rose-dim);
+      background: var(--bg-card);
       text-align: center;
+      border-radius: var(--radius-md);
+      box-shadow: 0 16px 56px rgba(196,120,138,0.12), 0 2px 10px rgba(184,146,74,0.07);
       animation: fadeInUp 0.6s ease both;
     }
 
-    .vault-icon { margin: 0 auto 24px; display: block; }
+    .vault-icon { margin: 0 auto 28px; display: block; }
 
     .login-title {
       font-family: var(--font-display);
-      font-size: 28px;
-      font-weight: 900;
-      letter-spacing: 7px;
-      color: var(--gold);
-      line-height: 1;
+      font-size: 32px; font-weight: 900; letter-spacing: 8px;
+      color: var(--rose); line-height: 1;
     }
 
     .login-subtitle {
       font-family: var(--font-display);
-      font-size: 9px;
-      letter-spacing: 3px;
-      color: var(--text-dim);
-      margin: 8px 0 24px;
-      font-style: italic;
+      font-size: 10px; letter-spacing: 3px; color: var(--text-dim);
+      margin: 10px 0 26px;
     }
 
-    .field-wrap { text-align: left; margin-bottom: 14px; }
+    .field-wrap { text-align: left; margin-bottom: 16px; }
 
     .login-footer {
-      margin-top: 24px;
-      font-family: var(--font-display);
-      font-size: 8px;
-      letter-spacing: 2px;
-      color: var(--text-dim);
+      margin-top: 28px; font-family: var(--font-display);
+      font-size: 9px; letter-spacing: 2px; color: var(--text-dim);
     }
-
-    .login-footer span { color: rgba(180,140,40,0.4); margin: 0 6px; }
+    .login-footer span { color: var(--rose-dim); margin: 0 6px; }
 
     #login-msg {
-      min-height: 20px;
-      font-family: var(--font-body);
-      font-size: 13px;
-      font-style: italic;
-      margin-top: 14px;
-      color: var(--danger);
+      min-height: 22px; font-family: var(--font-body);
+      font-size: 15px; font-style: italic; margin-top: 14px;
     }
   </style>
 </head>
 <body>
-
-  <!-- Fondos decorativos -->
   <div class="vault-bg-pattern"></div>
   <div class="vault-grid"></div>
   <div class="corner tl"></div>
@@ -73,32 +57,26 @@
   <div class="corner bl"></div>
   <div class="corner br"></div>
 
-  <!-- Tarjeta de login -->
   <div class="login-card">
-
-    <!-- Ícono de candado SVG -->
-    <svg class="vault-icon lock-pulse" width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="11" y="32" width="50" height="34" rx="2" fill="none" stroke="#c8a84b" stroke-width="1.5"/>
-      <rect x="15" y="36" width="42" height="26" rx="1" fill="none" stroke="rgba(180,140,40,0.2)" stroke-width="0.75"/>
-      <path d="M22 32V23a14 14 0 0 1 28 0v9" stroke="#c8a84b" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-      <circle cx="36" cy="50" r="5.5" fill="none" stroke="#c8a84b" stroke-width="1.2"/>
-      <line x1="36" y1="55.5" x2="36" y2="59" stroke="#c8a84b" stroke-width="1.2" stroke-linecap="round"/>
-      <!-- Tornillos decorativos -->
-      <circle cx="17" cy="43" r="1.8" fill="rgba(180,140,40,0.3)"/>
-      <circle cx="55" cy="43" r="1.8" fill="rgba(180,140,40,0.3)"/>
-      <circle cx="17" cy="55" r="1.8" fill="rgba(180,140,40,0.3)"/>
-      <circle cx="55" cy="55" r="1.8" fill="rgba(180,140,40,0.3)"/>
-      <!-- Líneas de apertura decorativas -->
-      <line x1="11" y1="43" x2="15.5" y2="43" stroke="rgba(180,140,40,0.25)" stroke-width="0.75"/>
-      <line x1="56.5" y1="43" x2="61" y2="43" stroke="rgba(180,140,40,0.25)" stroke-width="0.75"/>
-      <!-- Dientes de llave arriba -->
-      <line x1="26" y1="2" x2="26" y2="7" stroke="rgba(180,140,40,0.18)" stroke-width="0.75"/>
-      <line x1="36" y1="2" x2="36" y2="6" stroke="rgba(180,140,40,0.18)" stroke-width="0.75"/>
-      <line x1="46" y1="2" x2="46" y2="7" stroke="rgba(180,140,40,0.18)" stroke-width="0.75"/>
+    <svg class="vault-icon lock-pulse" width="76" height="76" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="11" y="32" width="50" height="34" rx="3" fill="rgba(232,180,192,0.18)" stroke="#c4788a" stroke-width="1.5"/>
+      <rect x="15" y="36" width="42" height="26" rx="2" fill="none" stroke="rgba(196,120,138,0.18)" stroke-width="0.75"/>
+      <path d="M22 32V23a14 14 0 0 1 28 0v9" stroke="#c4788a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      <circle cx="36" cy="50" r="5.5" fill="rgba(212,176,122,0.15)" stroke="#b8924a" stroke-width="1.2"/>
+      <line x1="36" y1="55.5" x2="36" y2="59" stroke="#b8924a" stroke-width="1.2" stroke-linecap="round"/>
+      <circle cx="17" cy="43" r="1.8" fill="rgba(196,120,138,0.35)"/>
+      <circle cx="55" cy="43" r="1.8" fill="rgba(196,120,138,0.35)"/>
+      <circle cx="17" cy="55" r="1.8" fill="rgba(196,120,138,0.35)"/>
+      <circle cx="55" cy="55" r="1.8" fill="rgba(196,120,138,0.35)"/>
+      <line x1="11"  y1="43" x2="15.5" y2="43" stroke="rgba(196,120,138,0.25)" stroke-width="0.75"/>
+      <line x1="56.5" y1="43" x2="61"  y2="43" stroke="rgba(196,120,138,0.25)" stroke-width="0.75"/>
+      <line x1="26" y1="2" x2="26" y2="7" stroke="rgba(184,146,74,0.22)" stroke-width="0.75"/>
+      <line x1="36" y1="2" x2="36" y2="6" stroke="rgba(184,146,74,0.22)" stroke-width="0.75"/>
+      <line x1="46" y1="2" x2="46" y2="7" stroke="rgba(184,146,74,0.22)" stroke-width="0.75"/>
     </svg>
 
     <h1 class="login-title">LIT VAULT</h1>
-    <p class="login-subtitle">Acceso Restringido &nbsp;·&nbsp; Solo Administrador</p>
+    <p class="login-subtitle">Acceso Restringido · Solo Administrador</p>
 
     <div class="divider"></div>
 
@@ -122,66 +100,48 @@
   </div>
 
   <script>
-    // CONFIG SUPABASE
-    const SUPABASE_URL = "TU_URL_DE_SUPABASE";
-    const SUPABASE_KEY = "TU_ANON_KEY_DE_SUPABASE";
+    const SUPABASE_URL = "https://jaoirokvofscundirnzk.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb2lyb2t2b2ZzY3VuZGlybnprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwNzU3NzMsImV4cCI6MjA5MDY1MTc3M30.U1NsVWh3ephcLjh8LGVVwQrAiEZJFt_BLiZYABgZmBY";
     const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // HELPERS
     function setMsg(text, type = 'error') {
       const el = document.getElementById('login-msg');
       el.textContent = text;
-      el.style.color = type === 'error' ? 'var(--danger)'
-                     : type === 'success' ? '#6dbf7e'
-                     : 'var(--text-muted)';
+      el.style.color = type === 'error'   ? 'var(--danger)'
+                     : type === 'success' ? 'var(--success)'
+                     : 'var(--gold)';
     }
 
-    function hashPassword(pass) {
-      return CryptoJS.SHA256(pass).toString();
-    }
-
-    // LOGIN
     async function attemptLogin() {
       const username = document.getElementById('inp-user').value.trim();
       const password = document.getElementById('inp-pass').value;
       const btn = document.getElementById('btn-login');
 
-      if (!username || !password) {
-        setMsg('Ingresa tus credenciales de acceso.');
-        return;
-      }
+      if (!username || !password) { setMsg('Ingresa tus credenciales.'); return; }
 
       btn.disabled = true;
       btn.textContent = 'Verificando...';
       setMsg('Autenticando...', 'info');
 
       try {
-        const passwordHash = hashPassword(password);
-
-        // Llama a la función RPC en Supabase (security definer)
         const { data, error } = await _sb.rpc('verify_admin', {
           p_username: username,
-          p_password_hash: passwordHash
+          p_password_hash: CryptoJS.SHA256(password).toString()
         });
 
         if (error) throw error;
 
         if (data === true) {
-          // Guardar master key en sessionStorage (se borra al cerrar tab)
-          // La master key es el password original para cifrar/descifrar con AES
           sessionStorage.setItem('masterKey', password);
           sessionStorage.setItem('sessionStart', Date.now().toString());
           sessionStorage.setItem('adminUser', username);
-
           setMsg('Acceso concedido. Abriendo bóveda...', 'success');
-
           setTimeout(() => { window.location.href = 'index.html'; }, 800);
         } else {
           setMsg('Credenciales incorrectas. Acceso denegado.');
           btn.disabled = false;
           btn.textContent = 'Abrir Bóveda';
         }
-
       } catch (err) {
         console.error(err);
         setMsg('Error de conexión. Revisa tu configuración.');
@@ -190,25 +150,18 @@
       }
     }
 
-    // Enter para login
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') attemptLogin();
-    });
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') attemptLogin(); });
 
-    // Si ya hay sesión válida, redirigir directamente
-    (function checkExistingSession() {
+    // Si ya hay sesión válida, saltar directamente al vault
+    (function checkSession() {
       const start = sessionStorage.getItem('sessionStart');
       const key   = sessionStorage.getItem('masterKey');
-      if (start && key) {
-        const elapsed = Date.now() - parseInt(start);
-        if (elapsed < 15 * 60 * 1000) {
-          window.location.href = 'index.html';
-        } else {
-          sessionStorage.clear();
-        }
+      if (start && key && (Date.now() - parseInt(start)) < 15 * 60 * 1000) {
+        window.location.href = 'index.html';
+      } else {
+        sessionStorage.clear();
       }
     })();
   </script>
-
 </body>
 </html>

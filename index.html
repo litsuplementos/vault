@@ -16,19 +16,20 @@
       padding: 32px 24px;
     }
 
-    /* Panel de añadir credencial */
     .add-panel {
-      background: var(--dark-card);
-      border: 1px solid var(--gold-dim);
+      background: var(--bg-card);
+      border: 1px solid var(--rose-dim);
       padding: 28px;
       margin-bottom: 36px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 20px rgba(196,120,138,0.07);
     }
 
     .add-panel-title {
       font-family: var(--font-display);
       font-size: 11px;
       letter-spacing: 3px;
-      color: var(--text-muted);
+      color: var(--gold);
       text-transform: uppercase;
       margin-bottom: 18px;
     }
@@ -45,15 +46,14 @@
     }
 
     .add-note {
-      font-size: 11px;
+      font-size: 12px;
       color: var(--text-dim);
       font-style: italic;
       margin-top: 12px;
       text-align: center;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
     }
 
-    /* Barra de herramientas / filtros */
     .toolbar {
       display: flex;
       justify-content: space-between;
@@ -67,43 +67,39 @@
       font-family: var(--font-display);
       font-size: 11px;
       letter-spacing: 3px;
-      color: var(--text-muted);
+      color: var(--rose);
       text-transform: uppercase;
     }
 
     .toolbar-count {
       font-family: var(--font-mono);
-      font-size: 11px;
+      font-size: 12px;
       color: var(--text-dim);
       margin-left: 10px;
     }
 
-    /* Grid de credenciales */
     .credentials-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 20px;
     }
 
-    /* Timer de sesión visual */
     .timer-bar {
-      height: 2px;
-      background: var(--gold-dim);
+      height: 3px;
+      background: var(--rose-dim);
       position: fixed;
-      top: 0;
-      left: 0;
+      top: 0; left: 0;
       z-index: 100;
       transition: width 1s linear, background 1s;
     }
 
-    /* Botón guardar compacto */
     .btn-save {
       font-family: var(--font-display);
       font-size: 10px;
       letter-spacing: 2px;
       font-weight: 600;
-      background: linear-gradient(135deg, #b8922a, #c8a84b);
-      color: #0a0805;
+      background: linear-gradient(135deg, var(--rose), var(--rose-light));
+      color: #fff8f4;
       border: none;
       padding: 10px 20px;
       cursor: pointer;
@@ -111,17 +107,16 @@
       white-space: nowrap;
       transition: opacity var(--transition);
       width: 100%;
+      text-shadow: 0 1px 2px rgba(90,40,55,0.18);
     }
     .btn-save:hover { opacity: 0.85; }
 
-    /* Toast de copiado */
     .toast {
       position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: rgba(14,11,7,0.95);
-      border: 1px solid var(--gold-dim);
-      color: #6dbf7e;
+      bottom: 24px; right: 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--rose-dim);
+      color: var(--success);
       font-family: var(--font-display);
       font-size: 10px;
       letter-spacing: 2px;
@@ -131,13 +126,14 @@
       transform: translateY(8px);
       transition: opacity 0.3s, transform 0.3s;
       pointer-events: none;
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 16px rgba(196,120,138,0.12);
     }
     .toast.show { opacity: 1; transform: translateY(0); }
   </style>
 </head>
 <body>
 
-  <!-- Barra de progreso de sesión -->
   <div class="timer-bar" id="timer-bar"></div>
   <div class="vault-bg-pattern"></div>
   <div class="vault-grid"></div>
@@ -146,9 +142,8 @@
   <div class="corner bl"></div>
   <div class="corner br"></div>
 
-  <!-- Navbar -->
   <nav class="vault-nav">
-    <div class="vault-nav-logo">LIT <span style="color: rgba(180,140,40,0.5);">VAULT</span></div>
+    <div class="vault-nav-logo">LIT <span style="color: var(--rose-dim);">VAULT</span></div>
     <div class="vault-nav-badge">AES-256 ENCRIPTADO</div>
     <div class="vault-nav-user">
       <span id="nav-user">—</span>
@@ -157,10 +152,8 @@
     </div>
   </nav>
 
-  <!-- Contenido principal -->
   <div class="main-wrap">
 
-    <!-- Panel añadir credencial -->
     <div class="add-panel fade-in">
       <p class="add-panel-title">Nueva Credencial</p>
       <div class="add-grid">
@@ -184,7 +177,6 @@
       <p class="add-note">Las contraseñas se encriptan localmente antes de subirse a la base de datos.</p>
     </div>
 
-    <!-- Toolbar y búsqueda -->
     <div class="toolbar">
       <div>
         <span class="toolbar-title">Bóveda</span>
@@ -196,14 +188,10 @@
       </div>
     </div>
 
-    <!-- Grid de credenciales -->
-    <div class="credentials-grid" id="credentials-grid">
-      <!-- Se rellena dinámicamente -->
-    </div>
+    <div class="credentials-grid" id="credentials-grid"></div>
 
   </div>
 
-  <!-- Toast de copiado -->
   <div class="toast" id="toast">Copiado al portapapeles</div>
 
   <script src="app.js"></script>
