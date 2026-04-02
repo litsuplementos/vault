@@ -88,14 +88,14 @@ body {
 .vault-nav-user span { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--text-muted); }
 
 .btn-logout {
-  font-family: var(--font-display); font-size: 9px; font-weight: 700; letter-spacing: 2px;
+  font-family: var(--font-display); font-size: 12px; font-weight: 700; letter-spacing: 2px;
   color: var(--danger); border: 1px solid rgba(184,58,42,0.22);
   background: transparent; padding: 5px 12px; cursor: pointer;
   transition: var(--transition); border-radius: var(--radius);
 }
 .btn-logout:hover { background: rgba(184,58,42,0.07); }
 
-/* ─── PESTAÑAS ──────────────────────────────────────────────── */
+/* PESTAÑAS */
 .tabs-wrap {
   position: relative; z-index: 9;
   display: flex; gap: 0;
@@ -186,7 +186,7 @@ body {
   display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
 }
 .credential-field-label {
-  font-family: var(--font-display); font-size: 8px; font-weight: 700;
+  font-family: var(--font-display); font-size: 12px; font-weight: 700;
   letter-spacing: 1.5px; color: var(--gold); text-transform: uppercase;
   flex-shrink: 0; min-width: 32px;
 }
@@ -206,7 +206,7 @@ body {
 .password-text { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--success); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 .btn-show, .btn-copy {
-  font-family: var(--font-display); font-size: 8px; font-weight: 700; letter-spacing: 1.5px;
+  font-family: var(--font-display); font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
   color: var(--text-muted); border: 1px solid var(--rose-dim); background: transparent;
   padding: 4px 8px; cursor: pointer; border-radius: var(--radius);
   transition: var(--transition); white-space: nowrap; flex-shrink: 0;
@@ -312,7 +312,7 @@ body {
 /* ─── BOTÓN VER/OCULTAR GLOBAL ──────────────────────────────── */
 .btn-global-toggle {
   display: flex; align-items: center; gap: 6px;
-  font-family: var(--font-display); font-size: 8px; font-weight: 700; letter-spacing: 1.5px;
+  font-family: var(--font-display); font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
   color: var(--text-muted); border: 1px solid var(--rose-dim); background: transparent;
   padding: 6px 12px; cursor: pointer; border-radius: var(--radius);
   transition: var(--transition); white-space: nowrap;
@@ -366,7 +366,7 @@ body {
   min-height: 36px;
 }
 .cred-row-header span {
-  font-family: var(--font-display); font-size: 8px; font-weight: 700;
+  font-family: var(--font-display); font-size: 12px; font-weight: 700;
   letter-spacing: 2px; color: var(--gold); text-transform: uppercase;
 }
 
@@ -426,7 +426,7 @@ body {
 }
 .toast.show { opacity: 1; transform: translateY(0); }
 
-/* ─── LOGIN PAGE ──────────────────────────────────────────────── */
+/* LOGIN PAGE */
 body.login-page {
   display: flex; align-items: center; justify-content: center;
   min-height: 100vh; overflow: hidden;
@@ -489,7 +489,6 @@ body.login-page {
 @media (max-width: 640px) {
   .vault-nav { padding: 12px 16px; }
   .vault-nav-logo { font-size: 14px; letter-spacing: 4px; }
-  .vault-nav-badge { display: none; }
   .corner { width: 44px; height: 44px; }
   .login-card { width: 90%; padding: 36px 24px 28px; }
   .tabs-wrap { padding: 0 16px; }
