@@ -12,7 +12,7 @@
   --rose-faint:   rgba(196, 120, 138, 0.10);
   --rose-dim:     rgba(196, 120, 138, 0.28);
 
-  --gold:         #000000;
+  --gold:         #434130;
   --gold-light:   #d4b07a;
   --gold-faint:   rgba(184, 146, 74, 0.10);
   --gold-dim:     rgba(184, 146, 74, 0.28);
@@ -119,6 +119,29 @@ body {
   font-weight: 700; letter-spacing: 2px; color: var(--gold);
   text-transform: uppercase; margin-bottom: 6px;
 }
+
+.input-password-wrap {
+  position: relative;
+}
+.input-password-wrap .vault-input {
+  padding-right: 44px;
+}
+.btn-toggle-pass {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  transition: color var(--transition);
+}
+.btn-toggle-pass:hover { color: var(--rose); }
+.eye-icon { width: 18px; height: 18px; display: block; }
 
 /* Botones */
 .btn-primary {

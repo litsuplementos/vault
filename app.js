@@ -1,23 +1,21 @@
-// app.js
-
 const SUPABASE_URL = "https://jaoirokvofscundirnzk.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imphb2lyb2t2b2ZzY3VuZGlybnprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwNzU3NzMsImV4cCI6MjA5MDY1MTc3M30.U1NsVWh3ephcLjh8LGVVwQrAiEZJFt_BLiZYABgZmBY";
 const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const SESSION_DURATION = 15 * 60 * 1000;
 
-// GUARD, detiene TODO el script si no hay sesión válida
+// GUARD — detiene TODO el script si no hay sesión válida
 function requireSession() {
   const key   = sessionStorage.getItem('masterKey');
   const start = sessionStorage.getItem('sessionStart');
 
   if (!key || !start) {
-    window.location.replace('pass.html');
+    window.location.replace('index.html');
     throw new Error('Sin sesión.');
   }
   if (Date.now() - parseInt(start) >= SESSION_DURATION) {
     sessionStorage.clear();
-    window.location.replace('pass.html');
+    window.location.replace('index.html');
     throw new Error('Sesión expirada.');
   }
 }
@@ -31,7 +29,13 @@ const adminUser  = sessionStorage.getItem('adminUser') || 'admin';
 const navUser = document.getElementById('nav-user');
 if (navUser) navUser.textContent = adminUser;
 
-// TIMER DE SESIÓN
+// CAMBIO 2 — debounce helper
+function debounce(fn, ms) {
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+
+// TIMER DE SESIÓN (sin renovación — al vencer los 15 min vuelve al login)
 let sessionInterval;
 
 function startSessionTimer() {
@@ -63,7 +67,7 @@ startSessionTimer();
 function logout() {
   clearInterval(sessionInterval);
   sessionStorage.clear();
-  window.location.replace('pass.html');
+  window.location.replace('index.html');
 }
 
 // CIFRADO AES-256
@@ -143,8 +147,9 @@ async function deleteCredential(id) {
   } catch (err) { console.error(err); alert('Error al eliminar.'); }
 }
 
-// FILTRAR
-function filterCredentials() {
+// CAMBIO 2 — filterCredentials con debounce (150 ms)
+// El render solo ocurre cuando el usuario para de escribir, no en cada tecla.
+const filterCredentials = debounce(() => {
   const query = document.getElementById('search-input').value.toLowerCase().trim();
   renderCredentials(query
     ? allCredentials.filter(c =>
@@ -153,7 +158,7 @@ function filterCredentials() {
         (c.notes || '').toLowerCase().includes(query))
     : allCredentials
   );
-}
+}, 150);
 
 // RENDERIZAR
 function renderCredentials(list) {
@@ -171,8 +176,11 @@ function renderCredentials(list) {
     return;
   }
 
+  const fragment = document.createDocumentFragment();
+
   list.forEach((item, index) => {
-    const decryptedPass = decrypt(item.password_hash);
+    // CAMBIO 1 — ya NO se descifra aquí.
+    // El hash se pasa directamente a los handlers; decrypt() solo corre al hacer clic.
     const date = new Date(item.created_at).toLocaleDateString('es-ES', {
       day: '2-digit', month: 'short', year: 'numeric'
     });
@@ -181,39 +189,29 @@ function renderCredentials(list) {
     card.className = 'credential-card fade-in';
     card.style.animationDelay = `${index * 0.05}s`;
 
+    // Botón eliminar
     const btnDelete = document.createElement('button');
     btnDelete.className = 'btn-delete';
     btnDelete.textContent = '✕';
     btnDelete.title = 'Eliminar';
     btnDelete.onclick = () => deleteCredential(item.id);
 
+    // Sitio
     const site = document.createElement('div');
     site.className = 'credential-site';
     site.textContent = item.site_name;
 
+    // Usuario
     const user = document.createElement('div');
     user.className = 'credential-user';
     user.textContent = item.username || '—';
 
-    // Notas (solo se muestra si hay contenido)
-    if (item.notes) {
-      const notesEl = document.createElement('div');
-      notesEl.className = 'credential-notes';
-      notesEl.textContent = item.notes;
-      card.appendChild(btnDelete);
-      card.appendChild(site);
-      card.appendChild(user);
-      card.appendChild(notesEl);
-    } else {
-      card.appendChild(btnDelete);
-      card.appendChild(site);
-      card.appendChild(user);
-    }
-
+    // Fecha
     const dateEl = document.createElement('div');
     dateEl.className = 'credential-date';
     dateEl.textContent = `Añadido: ${date}`;
 
+    // Password display
     const passDisplay = document.createElement('div');
     passDisplay.className = 'password-display';
 
@@ -224,24 +222,35 @@ function renderCredentials(list) {
     const btnShow = document.createElement('button');
     btnShow.className = 'btn-show';
     btnShow.textContent = 'VER';
-    btnShow.onclick = () => togglePass(passText, btnShow, decryptedPass);
+    // CAMBIO 1 — decrypt() ocurre aquí, solo cuando el usuario hace clic en VER
+    btnShow.onclick = () => togglePass(passText, btnShow, decrypt(item.password_hash));
 
     const btnCopy = document.createElement('button');
     btnCopy.className = 'btn-copy';
     btnCopy.textContent = 'COPIAR';
+    // CAMBIO 1 — decrypt() ocurre aquí, solo cuando el usuario hace clic en COPIAR
     btnCopy.onclick = () => {
-      navigator.clipboard.writeText(decryptedPass)
+      navigator.clipboard.writeText(decrypt(item.password_hash))
         .then(() => showToast('Contraseña copiada'))
         .catch(() => showToast('No se pudo copiar'));
     };
 
-    passDisplay.appendChild(passText);
-    passDisplay.appendChild(btnShow);
-    passDisplay.appendChild(btnCopy);
-    card.appendChild(dateEl);
-    card.appendChild(passDisplay);
-    container.appendChild(card);
+    passDisplay.append(passText, btnShow, btnCopy);
+
+    card.append(btnDelete, site, user);
+
+    if (item.notes) {
+      const notesEl = document.createElement('div');
+      notesEl.className = 'credential-notes';
+      notesEl.textContent = item.notes;
+      card.appendChild(notesEl);
+    }
+
+    card.append(dateEl, passDisplay);
+    fragment.appendChild(card);
   });
+
+  container.appendChild(fragment);
 }
 
 // TOGGLE PASS
@@ -255,5 +264,12 @@ function togglePass(textEl, btn, plainPass) {
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && document.activeElement.id.startsWith('inp-')) saveCredential();
 });
+
+function togglePassInput(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  btn.querySelector('.eye-icon').style.opacity = isHidden ? '0.4' : '1';
+}
 
 fetchCredentials();

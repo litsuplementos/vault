@@ -47,7 +47,15 @@
 
     <div class="field-wrap">
       <label class="field-label" for="inp-pass">Clave Maestra</label>
-      <input class="vault-input" type="password" id="inp-pass" placeholder="••••••••••••" autocomplete="off"/>
+      <div class="input-password-wrap">
+        <input class="vault-input" type="password" id="inp-pass" placeholder="••••••••••••" autocomplete="off"/>
+        <button type="button" class="btn-toggle-pass" onclick="togglePassInput('inp-pass', this)" tabindex="-1">
+          <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
     </div>
 
     <button class="btn-primary" id="btn-login" onclick="attemptLogin()">Abrir Bóveda</button>
@@ -122,6 +130,13 @@
         sessionStorage.clear();
       }
     })();
+
+    function togglePassInput(inputId, btn) {
+      const input = document.getElementById(inputId);
+      const isHidden = input.type === 'password';
+      input.type = isHidden ? 'text' : 'password';
+      btn.querySelector('.eye-icon').style.opacity = isHidden ? '0.4' : '1';
+    }
   </script>
 </body>
 </html>
