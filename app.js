@@ -4,11 +4,9 @@ const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const SESSION_DURATION = 15 * 60 * 1000;
 
-// GUARD — detiene TODO el script si no hay sesión válida
 function requireSession() {
   const key   = sessionStorage.getItem('masterKey');
   const start = sessionStorage.getItem('sessionStart');
-
   if (!key || !start) {
     window.location.replace('index.html');
     throw new Error('Sin sesión.');
@@ -22,20 +20,59 @@ function requireSession() {
 
 requireSession();
 
-// INIT
 const MASTER_KEY = sessionStorage.getItem('masterKey');
 const adminUser  = sessionStorage.getItem('adminUser') || 'admin';
 
 const navUser = document.getElementById('nav-user');
 if (navUser) navUser.textContent = adminUser;
 
-// CAMBIO 2 — debounce helper
+// DEBOUNCE
 function debounce(fn, ms) {
   let t;
   return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
 }
 
-// TIMER DE SESIÓN (sin renovación — al vencer los 15 min vuelve al login)
+// ESTADO
+let currentView       = 'rows';   // 'rows' | 'cards'
+let passwordsVisible  = false;    // ver/ocultar global
+
+// PESTAÑAS
+function switchTab(tab) {
+  document.getElementById('panel-nueva').style.display  = tab === 'nueva'  ? 'block' : 'none';
+  document.getElementById('panel-boveda').style.display = tab === 'boveda' ? 'block' : 'none';
+  document.getElementById('tab-nueva').classList.toggle('active',  tab === 'nueva');
+  document.getElementById('tab-boveda').classList.toggle('active', tab === 'boveda');
+}
+
+// VISTA (filas / tarjetas)
+function setView(view) {
+  currentView = view;
+  document.getElementById('btn-view-rows').classList.toggle('active',  view === 'rows');
+  document.getElementById('btn-view-cards').classList.toggle('active', view === 'cards');
+  filterCredentials();
+}
+
+// Inicializar botones de vista
+document.getElementById('btn-view-rows').classList.add('active');
+
+// VER / OCULTAR GLOBAL
+function toggleAllPasswords() {
+  passwordsVisible = !passwordsVisible;
+  const label = document.getElementById('global-vis-label');
+  label.textContent = passwordsVisible ? 'Ocultar todo' : 'Ver todo';
+
+  document.querySelectorAll('.pass-text-cell, .password-text').forEach(el => {
+    const hash = el.dataset.hash;
+    if (!hash) return;
+    el.textContent = passwordsVisible ? decrypt(hash) : '••••••••';
+  });
+
+  document.querySelectorAll('.btn-show').forEach(btn => {
+    btn.textContent = passwordsVisible ? 'OCULTAR' : 'VER';
+  });
+}
+
+// TIMER DE SESIÓN
 let sessionInterval;
 
 function startSessionTimer() {
@@ -119,6 +156,8 @@ async function saveCredential() {
     document.getElementById('inp-pass').value  = '';
     document.getElementById('inp-notes').value = '';
     await fetchCredentials();
+    // Ir a la bóveda tras guardar
+    switchTab('boveda');
   } catch (err) {
     console.error(err);
     setMsg('add-msg', 'Error al guardar. Revisa la conexión.', 'error');
@@ -147,8 +186,7 @@ async function deleteCredential(id) {
   } catch (err) { console.error(err); alert('Error al eliminar.'); }
 }
 
-// CAMBIO 2 — filterCredentials con debounce (150 ms)
-// El render solo ocurre cuando el usuario para de escribir, no en cada tecla.
+// FILTRAR (con debounce)
 const filterCredentials = debounce(() => {
   const query = document.getElementById('search-input').value.toLowerCase().trim();
   renderCredentials(query
@@ -162,25 +200,128 @@ const filterCredentials = debounce(() => {
 
 // RENDERIZAR
 function renderCredentials(list) {
-  const container = document.getElementById('credentials-grid');
+  const container = document.getElementById('credentials-container');
   const countEl   = document.getElementById('cred-count');
 
   container.innerHTML = '';
   countEl.textContent = `${list.length} ${list.length === 1 ? 'registro' : 'registros'}`;
 
   if (list.length === 0) {
-    const empty = document.createElement('div');
-    empty.className = 'empty-state';
-    empty.innerHTML = '<div class="empty-state-icon">🔒</div><p class="empty-state-text">La bóveda está vacía</p>';
-    container.appendChild(empty);
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">🔒</div>
+        <p class="empty-state-text">La bóveda está vacía</p>
+      </div>`;
     return;
   }
+
+  if (currentView === 'rows') {
+    renderRows(list, container);
+  } else {
+    renderCards(list, container);
+  }
+}
+
+// VISTA FILAS
+function renderRows(list, container) {
+  const table = document.createElement('div');
+  table.className = 'cred-table';
+
+  // Cabecera
+  const header = document.createElement('div');
+  header.className = 'cred-row cred-row-header';
+  header.innerHTML = `
+    <span class="col-site">Servicio</span>
+    <span class="col-user">Usuario</span>
+    <span class="col-pass">Contraseña</span>
+    <span class="col-notes">Notas</span>
+    <span class="col-date">Añadido</span>
+    <span class="col-actions"></span>
+  `;
+  table.appendChild(header);
+
+  const fragment = document.createDocumentFragment();
+
+  list.forEach(item => {
+    const date = new Date(item.created_at).toLocaleDateString('es-ES', {
+      day: '2-digit', month: 'short', year: 'numeric'
+    });
+
+    const row = document.createElement('div');
+    row.className = 'cred-row';
+
+    // Servicio
+    const colSite = document.createElement('span');
+    colSite.className = 'col-site credential-site-inline';
+    colSite.textContent = item.site_name;
+
+    // Usuario
+    const colUser = document.createElement('span');
+    colUser.className = 'col-user cred-mono';
+    colUser.textContent = item.username || '—';
+
+    // Contraseña
+    const colPass = document.createElement('span');
+    colPass.className = 'col-pass';
+
+    const passSpan = document.createElement('span');
+    passSpan.className = 'pass-text-cell';
+    passSpan.dataset.hash = item.password_hash;
+    passSpan.textContent = passwordsVisible ? decrypt(item.password_hash) : '••••••••';
+
+    const btnShow = document.createElement('button');
+    btnShow.className = 'btn-show';
+    btnShow.textContent = passwordsVisible ? 'OCULTAR' : 'VER';
+    btnShow.onclick = () => togglePassCell(passSpan, btnShow, item.password_hash);
+
+    const btnCopy = document.createElement('button');
+    btnCopy.className = 'btn-copy';
+    btnCopy.textContent = 'COPIAR';
+    btnCopy.onclick = () => {
+      navigator.clipboard.writeText(decrypt(item.password_hash))
+        .then(() => showToast('Contraseña copiada'))
+        .catch(() => showToast('No se pudo copiar'));
+    };
+
+    colPass.append(passSpan, btnShow, btnCopy);
+
+    // Notas
+    const colNotes = document.createElement('span');
+    colNotes.className = 'col-notes cred-notes-inline';
+    colNotes.textContent = item.notes || '—';
+
+    // Fecha
+    const colDate = document.createElement('span');
+    colDate.className = 'col-date cred-date-inline';
+    colDate.textContent = date;
+
+    // Acciones
+    const colActions = document.createElement('span');
+    colActions.className = 'col-actions';
+
+    const btnDelete = document.createElement('button');
+    btnDelete.className = 'btn-delete';
+    btnDelete.textContent = '✕';
+    btnDelete.title = 'Eliminar';
+    btnDelete.onclick = () => deleteCredential(item.id);
+    colActions.appendChild(btnDelete);
+
+    row.append(colSite, colUser, colPass, colNotes, colDate, colActions);
+    fragment.appendChild(row);
+  });
+
+  table.appendChild(fragment);
+  container.appendChild(table);
+}
+
+// VISTA TARJETAS
+function renderCards(list, container) {
+  const grid = document.createElement('div');
+  grid.className = 'credentials-grid';
 
   const fragment = document.createDocumentFragment();
 
   list.forEach((item, index) => {
-    // CAMBIO 1 — ya NO se descifra aquí.
-    // El hash se pasa directamente a los handlers; decrypt() solo corre al hacer clic.
     const date = new Date(item.created_at).toLocaleDateString('es-ES', {
       day: '2-digit', month: 'short', year: 'numeric'
     });
@@ -201,34 +342,40 @@ function renderCredentials(list) {
     site.className = 'credential-site';
     site.textContent = item.site_name;
 
-    // Usuario
-    const user = document.createElement('div');
-    user.className = 'credential-user';
-    user.textContent = item.username || '—';
+    // Usuario (con etiqueta)
+    const userWrap = document.createElement('div');
+    userWrap.className = 'credential-field-wrap';
+    const userLabel = document.createElement('span');
+    userLabel.className = 'credential-field-label';
+    userLabel.textContent = 'User:';
+    const userVal = document.createElement('span');
+    userVal.className = 'credential-user';
+    userVal.textContent = item.username || '—';
+    userWrap.append(userLabel, userVal);
 
-    // Fecha
-    const dateEl = document.createElement('div');
-    dateEl.className = 'credential-date';
-    dateEl.textContent = `Añadido: ${date}`;
+    // Password display (con etiqueta)
+    const passWrap = document.createElement('div');
+    passWrap.className = 'credential-field-wrap';
+    const passLabel = document.createElement('span');
+    passLabel.className = 'credential-field-label';
+    passLabel.textContent = 'Pass:';
 
-    // Password display
     const passDisplay = document.createElement('div');
     passDisplay.className = 'password-display';
 
     const passText = document.createElement('span');
     passText.className = 'password-text';
-    passText.textContent = '••••••••';
+    passText.dataset.hash = item.password_hash;
+    passText.textContent = passwordsVisible ? decrypt(item.password_hash) : '••••••••';
 
     const btnShow = document.createElement('button');
     btnShow.className = 'btn-show';
-    btnShow.textContent = 'VER';
-    // CAMBIO 1 — decrypt() ocurre aquí, solo cuando el usuario hace clic en VER
-    btnShow.onclick = () => togglePass(passText, btnShow, decrypt(item.password_hash));
+    btnShow.textContent = passwordsVisible ? 'OCULTAR' : 'VER';
+    btnShow.onclick = () => togglePassCell(passText, btnShow, item.password_hash);
 
     const btnCopy = document.createElement('button');
     btnCopy.className = 'btn-copy';
     btnCopy.textContent = 'COPIAR';
-    // CAMBIO 1 — decrypt() ocurre aquí, solo cuando el usuario hace clic en COPIAR
     btnCopy.onclick = () => {
       navigator.clipboard.writeText(decrypt(item.password_hash))
         .then(() => showToast('Contraseña copiada'))
@@ -236,8 +383,14 @@ function renderCredentials(list) {
     };
 
     passDisplay.append(passText, btnShow, btnCopy);
+    passWrap.append(passLabel, passDisplay);
 
-    card.append(btnDelete, site, user);
+    // Fecha
+    const dateEl = document.createElement('div');
+    dateEl.className = 'credential-date';
+    dateEl.textContent = `Añadido: ${date}`;
+
+    card.append(btnDelete, site, userWrap);
 
     if (item.notes) {
       const notesEl = document.createElement('div');
@@ -246,21 +399,22 @@ function renderCredentials(list) {
       card.appendChild(notesEl);
     }
 
-    card.append(dateEl, passDisplay);
+    card.append(dateEl, passWrap);
     fragment.appendChild(card);
   });
 
-  container.appendChild(fragment);
+  grid.appendChild(fragment);
+  container.appendChild(grid);
 }
 
-// TOGGLE PASS
-function togglePass(textEl, btn, plainPass) {
-  const isHidden = textEl.textContent === '••••••••';
-  textEl.textContent = isHidden ? plainPass : '••••••••';
-  btn.textContent    = isHidden ? 'OCULTAR' : 'VER';
+// TOGGLE PASS (individual)
+function togglePassCell(el, btn, hash) {
+  const isHidden = el.textContent === '••••••••';
+  el.textContent = isHidden ? decrypt(hash) : '••••••••';
+  btn.textContent = isHidden ? 'OCULTAR' : 'VER';
 }
 
-// ENTER
+// ENTER en formulario
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter' && document.activeElement.id.startsWith('inp-')) saveCredential();
 });
